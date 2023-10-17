@@ -1,3 +1,4 @@
+import langchain
 import streamlit as st
 from dotenv import load_dotenv
 from PyPDF2 import PdfReader
@@ -21,6 +22,7 @@ from langchain.prompts.chat import (
 
 import os
 import pickle
+from pathlib import Path
 
 # the knowledge folder under thesame directory as this file
 DOC_DIR = os.path.join(os.path.dirname(__file__), "knowledge")
@@ -50,7 +52,9 @@ def get_text_chunks(data):
     return_data = [d.copy() for d in data]
 
     for page, return_page in zip(data, return_data):
-        return_page["chunks"] = text_splitter.split_text(page['text'])
+        tmp_chunks = text_splitter.split_text(page['text'])
+        new_chunks = ["[" + Path(page["meta"]["file"]).stem + "] " + chunk for chunk in tmp_chunks]
+        return_page["chunks"] = new_chunks
 
     return return_data
 
@@ -112,7 +116,7 @@ class PrintRetrievalHandler(BaseCallbackHandler):
         self.status = container.status("**Private Knowledge Grounding**")
 
     def on_retriever_start(self, serialized: dict, query: str, **kwargs):
-        self.status.write(f"**Question:** {query}")
+        self.status.write(f"**Related Knowledge:**")
         self.status.update(label=f"**Private Knowledge Grounding:** {query}")
 
     def on_retriever_end(self, documents, **kwargs):
@@ -151,7 +155,7 @@ vs = prepare_pdfs()
 st.header("Motherson LLM POC")
     
 
-llm = ChatOpenAI(streaming=True, temperature=0.5, model_name="gpt-3.5-turbo")
+llm = ChatOpenAI(streaming=True, temperature=0, model_name="gpt-4")
 # llm = HuggingFaceHub(repo_id="google/flan-t5-xxl", model_kwargs={"temperature":0.5, "max_length":512})
 
 document_combine_prompt = PromptTemplate(
@@ -167,7 +171,7 @@ msgs = StreamlitChatMessageHistory()
 memory = ConversationBufferMemory(
     memory_key='chat_history', chat_memory=msgs, return_messages=True)
 
-SYSTEM_TEMPLATE = """You are an agent to interactive chats with documents, complete with source references for fact checking. THINK STEP BY STEP. ALWAYS PROVIDE QUOTES AND SOURCE CITIATIONS. Use the following related documents fetched by semantic search to answer the users question. BE AWARE OF THE TIME OF REFERENCE. If you don't know the answer, just ask user to rephrase question to query for more documents, don't try to make up an answer.
+SYSTEM_TEMPLATE = """You are an agent to interactive chats with annual report documents, complete with source references for fact checking. THINK STEP BY STEP. ALWAYS PROVIDE QUOTES AND SOURCE CITIATIONS. Use the following related documents fetched by semantic search to answer the users question. BE AWARE OF THE TIME OF REFERENCE.
 ----------------
 {context}"""
 
@@ -193,17 +197,19 @@ if len(msgs.messages) == 0:
     msgs.add_ai_message("Ask me anything about Motherson's annual reports (2020-2023)!")
     
 
-QLICO = "https://questlabs.io/favicon.ico"
-USRICO = "https://yestherapyhelps.com/images/frases-y-reflexiones/339/75-frases-y-reflexiones-de-michel-foucault-3.jpg"
-
+roles = {"human": "user", "ai": "assistant"}
+avatars = {
+    "human": "https://yestherapyhelps.com/images/frases-y-reflexiones/339/75-frases-y-reflexiones-de-michel-foucault-3.jpg", 
+    "ai": "https://questlabs.io/favicon.ico"
+}
 for msg in msgs.messages:
     if isinstance(msg, SystemMessage):
         continue
-    st.chat_message("assistant", avatar=QLICO).write(msg.content)
+    st.chat_message(roles[msg.type], avatar=avatars[msg.type]).write(msg.content)
 
 if prompt := st.chat_input("Ask a question about Motherson's annual reports (2020-2023)"):
-    st.chat_message("user", avatar=USRICO).write(prompt)
-    with st.chat_message("assistant", avatar=QLICO):
+    st.chat_message("user", avatar=avatars["human"]).write(prompt)
+    with st.chat_message("assistant", avatar=avatars["ai"]):
         retrieval_handler = PrintRetrievalHandler(st.container())
         box = st.empty()
         stream_handler = StreamHandler(box)
