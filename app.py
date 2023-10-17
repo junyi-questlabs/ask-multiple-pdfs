@@ -60,7 +60,7 @@ def get_text_chunks(data):
 
 def get_vectorstore(pgbar, text_chunks):
     embeddings = OpenAIEmbeddings()
-    vectorstores = FAISS.from_texts(["empty"], embeddings)
+    vectorstores = FAISS.from_texts(["empty"], embeddings, metadatas=[text_chunks[0]["meta"]])
 
     # Ensure the cache directory exists
     if not os.path.exists("cache"):
@@ -120,6 +120,7 @@ class PrintRetrievalHandler(BaseCallbackHandler):
         self.status.update(label=f"**Private Knowledge Grounding:** {query}")
 
     def on_retriever_end(self, documents, **kwargs):
+        # print(documents)
         for idx, doc in enumerate(documents):
             source = os.path.basename(doc.metadata["source"])
             self.status.write(f"**Knowledge Snippet {idx+1}** _{source}_")
