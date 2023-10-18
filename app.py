@@ -58,6 +58,9 @@ def get_text_chunks(data):
 
     return return_data
 
+# TODO PRIORITY-LOW
+# TODO Batch the embeddings calls
+# TODO Use a local embeddings model
 def get_vectorstore(pgbar, text_chunks):
     embeddings = OpenAIEmbeddings()
     vectorstores = FAISS.from_texts(["empty"], embeddings, metadatas=[text_chunks[0]["meta"]])
