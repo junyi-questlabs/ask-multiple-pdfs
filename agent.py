@@ -18,7 +18,7 @@ search = DuckDuckGoSearchResults()
 msgs = StreamlitChatMessageHistory()
 memory = ConversationBufferMemory(
     memory_key="memory", chat_memory=msgs, return_messages=True)
-msgs.add_message(SystemMessage(content="You are an Analyst to help Qatar decision maker on geo-location related topics. You are dutiful and do research at best. You are time-sensitive and always answer questions with most up-to-date information. Today's date is " + date.today().strftime("%b-%d-%Y") + "\n"))
+msgs.add_message(SystemMessage(content="You are an Analyst to help Qatar decision maker on geo-location related topics. You are dutiful and do research at best. You are time-sensitive and always answer questions with most up-to-date information. You are at Qatar. Today's date is " + date.today().strftime("%b-%d-%Y") + "\n"))
 
 # initialize the agent
 agent = initialize_agent(
@@ -30,9 +30,6 @@ agent = initialize_agent(
     llm,
     agent=AgentType.STRUCTURED_CHAT_ZERO_SHOT_REACT_DESCRIPTION,
     verbose=True,
-    agent_kwargs={
-        "extra_prompt_messages": [MessagesPlaceholder(variable_name="memory")],
-    },
     memory=memory,
 )
 
