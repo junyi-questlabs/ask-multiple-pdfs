@@ -1,11 +1,10 @@
 from langchain.callbacks.streamlit.streamlit_callback_handler import StreamlitCallbackHandler
 from langchain.agents import AgentType, initialize_agent, Tool
 from langchain.chat_models import ChatOpenAI
-from langchain.prompts import MessagesPlaceholder
 from langchain.memory import ConversationBufferMemory
 from langchain.memory.chat_message_histories import StreamlitChatMessageHistory
 from langchain.schema.messages import SystemMessage
-from langchain.tools import DuckDuckGoSearchResults
+from langchain.tools import DuckDuckGoSearchRun
 
 import streamlit as st
 from datetime import date
@@ -14,7 +13,7 @@ st.write("### Ask anything")
 
 # set up the agent
 llm = ChatOpenAI(model_name="gpt-4-1106-preview", temperature=0)
-search = DuckDuckGoSearchResults()
+search = DuckDuckGoSearchRun()
 msgs = StreamlitChatMessageHistory()
 memory = ConversationBufferMemory(
     memory_key="memory", chat_memory=msgs, return_messages=True)
