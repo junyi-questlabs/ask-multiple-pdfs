@@ -15,7 +15,8 @@ from datetime import date
 
 load_dotenv()
 
-st.write("### Ask anything")
+st.set_page_config(page_title="Saharaa AI Chat", page_icon="https://questlabs.io/favicon.ico")
+st.markdown("<h1 style='text-align: center; color: white;'>Saharaa AI Chat</h1>", unsafe_allow_html=True)
 
 from langchain.tools import BaseTool
 
@@ -60,7 +61,7 @@ Pearls, precious metals and articles thereof - €604M
 
 class UAEExportUSData(BaseTool):
     name = "UAE_Export_Data"
-    description = "use this tool when you need export data of UAE to US and Europe"
+    description = "use this tool when you need highlevel export data of UAE to US and Europe, in format of category, revenue"
 
     _ret = """
 Following is a list of the top exports of UAE to US of 2021:
@@ -111,28 +112,28 @@ Machinery and appliances - €691M
 
 class ChinaManufactureData(BaseTool):
     name = "China_Manufacture_Data"
-    description = "use this tool when you need Manufacture data of China"
+    description = "use this tool when you need highlevel Manufacture data of China, in format of category, revenue"
 
     _ret = """
 Following is a list of the top Manufactures of China of 2022 (in Thousand USD):
-Mechanical & Electrical Products 	165267928.50 	179087608.85
-Machinery & Transport Equipment 	139506088.89 	150261133.93
-High-&-new-tech Products 	74811732.00 	81534878.00
-Handled Wireless Phone and Its Parts 	18738917.05 	15984001.83
-Mobile Telephone 	18738917.00 	15984002.00
-Automatic Data Proc. Eq. & Components 	15600784.00 	17453880.00
-Integrated Circuit 	11178307.80 	13498501.43
-Motor Vehicles & Chassis 	10273898.81 	9192069.13
-Digital Automatic Data Proc. Equip. 	8799244.00 	9531412.00
-Agricultural Products 	8283537.36 	8333868.81
-Plastic Products 	7902291.00 	8730828.00
-Iron & Steel Products 	7283144.16 	7946163.27
-Auto Parts 	6840770.00 	7634252.00
-Steel Products 	6288031.00 	6564606.00
-Food & Live Animals 	6195023.41 	6188822.65
-Furniture & Related Products 	5256500.00 	5316036.00
-Iron & Steel 	5235163.39 	5332277.03
-Refined Petroleum Oil (value) 	4248021.00 	4382065.00
+Mechanical & Electrical Products 	165267928.50
+Machinery & Transport Equipment 	139506088.89
+High-&-new-tech Products 	74811732.00
+Handled Wireless Phone and Its Parts 	18738917.05
+Mobile Telephone 	18738917.00
+Automatic Data Proc. Eq. & Components 	15600784.00
+Integrated Circuit 	11178307.80
+Motor Vehicles & Chassis 	10273898.81
+Digital Automatic Data Proc. Equip. 	8799244.00
+Agricultural Products 	8283537.36
+Plastic Products 	7902291.00
+Iron & Steel Products 	7283144.16
+Auto Parts 	6840770.00
+Steel Products 	6288031.00
+Food & Live Animals 	6195023.41
+Furniture & Related Products 	5256500.00
+Iron & Steel 	5235163.39
+Refined Petroleum Oil (value) 	4248021.00
 """
     def _run(self):
         return self._ret
@@ -142,7 +143,7 @@ Refined Petroleum Oil (value) 	4248021.00 	4382065.00
 
 class ChinaExportUSData(BaseTool):
     name = "China_Export_US_Data"
-    description = "use this tool when you need export data of China to US"
+    description = "use this tool when you need highlevel export data of China to US, in format of category, revenue"
 
     _ret = """
 Following is a list of the top exports of China to US of 2022:
