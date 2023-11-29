@@ -17,7 +17,7 @@ from datetime import date
 load_dotenv()
 
 st.set_page_config(page_title="Saharaa AI Chat", page_icon="https://saharaa.ai/images/app-logo.png")
-st.markdown("<h1 style='text-align: center; color: white;'>Saharaa AI Chat</h1>", unsafe_allow_html=True)
+st.markdown("<h2 style='text-align: center; color: white;'><img style=\"margin-right: .5em; height: 1em;\" src='https://saharaa.ai/images/app-logo.png'>Saharaa AI Chat</h1>", unsafe_allow_html=True)
 
 from langchain.tools import BaseTool
 
@@ -27,6 +27,7 @@ QUESTIONS = [
     "Will there be another blockade on Qatar? How soon?"
 ]
 
+# Sorry for the selectors but Streamlit sucks
 styl = f"""
 <style>
     div[aria-label="Chat message from assistant"]::before {{
@@ -41,8 +42,44 @@ styl = f"""
         font-weight: bold;
     }}
 
+    :nth-child(odd of .stChatMessage) {{
+        background-color: #3A44A6;
+        padding-right: 1em;
+        border-radius: 8px;
+    }}
+
+    :nth-child(even of .stChatMessage) {{
+        background-color: #2D2F31;;
+        padding-right: 1em;
+        border-radius: 8px;
+    }}
+
     button > div > p {{
         text-align: left;
+    }}
+
+    .stChatInputContainer {{
+        background-color: inherit;
+
+    }}
+
+    .stChatInputContainer > div > div {{
+        border-bottom-color: grey;
+        border-top-color: grey;
+        border-left-color: grey;
+        border-right-color: grey;
+        border-radius: 50px;
+    }}
+
+    .stChatInputContainer > div > div:focus-within {{
+        border-bottom-color: white;
+        border-top-color: white;
+        border-left-color: white;
+        border-right-color: white;
+    }}
+
+    .st-ch::placeholder {{
+        color: lightgrey;
     }}
 </style>
 """
@@ -278,7 +315,7 @@ for msg in msgs.messages:
 prompt = st.session_state.get("prompt", None)
 # Onboarding Box
 if "onboarded" not in st.session_state:
-    st.markdown("Ask me anything, or start from questions you may like to ask:")
+    st.markdown("Ask anything, or start from questions you may like to ask:")
     if st.button(QUESTIONS[0]):
         prompt = QUESTIONS[0]
     if st.button(QUESTIONS[1]):
@@ -286,7 +323,7 @@ if "onboarded" not in st.session_state:
     if st.button(QUESTIONS[2]):
         prompt = QUESTIONS[2]
 
-prompt = st.chat_input() or prompt
+prompt = st.chat_input(placeholder="Ask any question") or prompt
 st.session_state["prompt"] = prompt
 
 if prompt:
@@ -300,3 +337,4 @@ if prompt:
         st_callback = StreamlitCallbackHandler(st.container())
         response = agent.run(prompt, callbacks=[st_callback])
         st.write(response)
+        # proposing further questions ... 
