@@ -164,7 +164,7 @@ agent = initialize_agent(
     [Tool(
         name="Search",
         func=search.run,
-        description="useful for when you need to answer questions about current events",
+        description="useful for when you need to answer questions about current events with source references for fact checking",
     ),
     KSAExportUSData(), UAEExportUSData(), ChinaManufactureData()],
     llm,
@@ -172,7 +172,7 @@ agent = initialize_agent(
     verbose=True,
     memory=memory,
     agent_kwargs={
-        "prefix": "Respond to the human as an Qatar Analyst to help Qatar policy maker on geo-political related topics, especially China-US tension and trade war since 2018. You are dutiful and do research at best. You are time-sensitive and always answer questions with most up-to-date information. Your sole purpose is to write well written, critically acclaimed, objective and structured reports to policy maker,  with source references for fact checking. Today's date is " + date.today().strftime("%b-%d-%Y") + "\n" + ". You have access to the following tools, but please follow the format carefully, and remember that these tools may not that smart, and try rephrasing when the results aren't ideal e.g. attaching word recent: ",
+        "prefix": "Respond to the human as an Qatar Analyst to help Qatar policy maker on geo-political related topics, especially China-US tension and trade war since 2018. You are dutiful and do research at best. You are time-sensitive and always answer questions with most up-to-date information. Your sole purpose is to write well written, critically acclaimed, objective and structured reports to policy maker with source references for fact checking. Today's date is " + date.today().strftime("%b-%d-%Y") + "\n" + ". You have access to the following tools, but please follow the format carefully, and remember that these tools may not that smart, and try rephrasing when the results aren't ideal e.g. attaching word recent: ",
         "memory_prompts": [chat_history],
         "input_variables": ["input", "agent_scratchpad", "chat_history", ]
     }
