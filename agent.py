@@ -10,15 +10,43 @@ from langchain.tools import DuckDuckGoSearchResults
 
 from dotenv import load_dotenv
 import streamlit as st
+import time
 
 from datetime import date
 
 load_dotenv()
 
-st.set_page_config(page_title="Saharaa AI Chat", page_icon="https://questlabs.io/favicon.ico")
+st.set_page_config(page_title="Saharaa AI Chat", page_icon="https://saharaa.ai/images/app-logo.png")
 st.markdown("<h1 style='text-align: center; color: white;'>Saharaa AI Chat</h1>", unsafe_allow_html=True)
 
 from langchain.tools import BaseTool
+
+QUESTIONS = [
+    "Products manufactured in UAE and KSA exported to USA and Europe linked to similar products manufactured in China",
+    "Movement of officials from the region around the world",
+    "Will there be another blockade on Qatar? How soon?"
+]
+
+styl = f"""
+<style>
+    div[aria-label="Chat message from assistant"]::before {{
+        content: "Saharaa AI Chat";
+        line-height: 2.2em;
+        font-weight: bold;
+    }}
+
+    div[aria-label="Chat message from user"]::before {{
+        content: "You";
+        line-height: 2.2em;
+        font-weight: bold;
+    }}
+
+    button > div > p {{
+        text-align: left;
+    }}
+</style>
+"""
+st.markdown(styl, unsafe_allow_html=True)
 
 class KSAExportUSData(BaseTool):
     name = "KSA_Export_Data"
@@ -193,7 +221,7 @@ agent = initialize_agent(
     verbose=True,
     memory=memory,
     agent_kwargs={
-        "prefix": "Respond to the human as an Qatar Analyst to help Qatar policy maker on geo-political related topics, especially China-US tension and trade war since 2018. You are dutiful and do research at best. You are time-sensitive and always answer questions with most up-to-date information. Your sole purpose is to write well written, critically acclaimed, objective and structured reports to human policy maker, ALWAYS with source references for fact checking. Today's date is " + date.today().strftime("%b-%d-%Y") + "\n" + ". You have access to the following tools: ",
+        "prefix": "Respond to the human as an Qatar Analyst to help human on geo-political related topics, especially China-US tension and trade war since 2018. You are dutiful and do research at best. You are time-sensitive and always answer questions with most up-to-date information. Your sole purpose is to write well written, critically acclaimed, objective and structured reports to human, ALWAYS with source references for fact checking. Today's date is " + date.today().strftime("%b-%d-%Y") + "\n" + ". You have access to the following tools: ",
         "format_instructions": """Use a json blob to specify a tool by providing an action key (tool name) and an action_input key (tool input).
 
 Valid "action" values: "Final Answer" or {tool_names}
@@ -239,15 +267,35 @@ Action:
 roles = {"human": "user", "ai": "assistant"}
 avatars = {
     "human": "https://yestherapyhelps.com/images/frases-y-reflexiones/339/75-frases-y-reflexiones-de-michel-foucault-3.jpg", 
-    "ai": "https://questlabs.io/favicon.ico"
+    "ai": "https://saharaa.ai/images/app-logo.png"
 }
+
 for msg in msgs.messages:
     if isinstance(msg, SystemMessage):
         continue
     st.chat_message(roles[msg.type], avatar=avatars[msg.type]).write(msg.content)
 
-if prompt := st.chat_input():
+prompt = st.session_state.get("prompt", None)
+# Onboarding Box
+if "onboarded" not in st.session_state:
+    st.markdown("Ask me anything, or start from questions you may like to ask:")
+    if st.button(QUESTIONS[0]):
+        prompt = QUESTIONS[0]
+    if st.button(QUESTIONS[1]):
+        prompt = QUESTIONS[1]
+    if st.button(QUESTIONS[2]):
+        prompt = QUESTIONS[2]
+
+prompt = st.chat_input() or prompt
+st.session_state["prompt"] = prompt
+
+if prompt:
+    if "onboarded" not in st.session_state:
+        st.session_state["onboarded"] = True
+        st.rerun()
+    st.empty() # Magic hack to hide the onboarding box instantly
     st.chat_message("user", avatar=avatars["human"]).write(prompt)
+    # To hide the onboarding box
     with st.chat_message("assistant", avatar=avatars["ai"]):
         st_callback = StreamlitCallbackHandler(st.container())
         response = agent.run(prompt, callbacks=[st_callback])
