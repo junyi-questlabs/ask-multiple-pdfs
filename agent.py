@@ -1,3 +1,4 @@
+from typing import List
 from langchain.callbacks.streamlit.streamlit_callback_handler import StreamlitCallbackHandler
 from langchain.agents import AgentType, initialize_agent, Tool
 from langchain.chat_models import ChatOpenAI
@@ -19,8 +20,8 @@ st.write("### Ask anything")
 from langchain.tools import BaseTool
 
 class KSAExportUSData(BaseTool):
-    name = "KSA_Export_US_Data"
-    description = "use this tool when you need export data of KSA to US"
+    name = "KSA_Export_Data"
+    description = "use this tool when you need export data of KSA to US and Europe"
 
     _ret = """
 Following is a list of the top exports of KSA to US of 2021:
@@ -43,16 +44,23 @@ Iron and steel 	$33.11M
 Glass and glassware 	$30.71M
 Manmade staple fibers 	$24.63M
 Optical, photo, technical, medical apparatus 	$22.78M
+
+Following is a list of the top exports of KSA to Europe of 2022:
+Mineral products - €36,489M
+Products of the chemical or allied industries - €3,145M
+Plastics, rubber and articles thereof - €2,668M
+Base metals and articles thereof - €636M
+Pearls, precious metals and articles thereof - €604M
 """
-    def _run(self):
+    def _run(self, destination: List[str]):
         return self._ret
     
-    def _arun(self):
+    def _arun(self, destination: List[str]):
         return self._ret
 
 class UAEExportUSData(BaseTool):
-    name = "UAE_Export_US_Data"
-    description = "use this tool when you need export data of UAE to US"
+    name = "UAE_Export_Data"
+    description = "use this tool when you need export data of UAE to US and Europe"
 
     _ret = """
 Following is a list of the top exports of UAE to US of 2021:
@@ -82,11 +90,23 @@ Toys, games, sports requisites 	$28.77M
 Miscellaneous articles of base metal 	$23.35M
 Articles of apparel, not knit or crocheted 	$23.26M
 Miscellaneous chemical products 	$20.91M
+
+Following is a list of the top exports of UAE to Europe of 2022:
+Mineral fuels, lubricants, and related materials - €6,083M
+Manufactured goods classified chiefly by material - €4,674M
+Machinery and transport equipment - €1,649M
+Chemicals and related products, n.e.s. - €593M
+Miscellaneous manufactured articles - €423M
+Mineral products - €6,092M
+Base metals and articles thereof - €2,695M
+Pearls, precious metals, and articles thereof - €2,217M
+Transport equipment - €985M
+Machinery and appliances - €691M
 """
-    def _run(self):
+    def _run(self, destination: List[str]):
         return self._ret
     
-    def _arun(self):
+    def _arun(self, destination: List[str]):
         return self._ret
 
 class ChinaManufactureData(BaseTool):
@@ -164,7 +184,7 @@ agent = initialize_agent(
     [Tool(
         name="Search",
         func=search.run,
-        description="useful for when you need to answer questions about current events with source references for fact checking",
+        description="useful for when you need to answer questions about current events with source references for fact checking, try rephrasing tool_input when the result isn't ideal e.g. attaching word recent",
     ),
     KSAExportUSData(), UAEExportUSData(), ChinaManufactureData()],
     llm,
@@ -172,7 +192,44 @@ agent = initialize_agent(
     verbose=True,
     memory=memory,
     agent_kwargs={
-        "prefix": "Respond to the human as an Qatar Analyst to help Qatar policy maker on geo-political related topics, especially China-US tension and trade war since 2018. You are dutiful and do research at best. You are time-sensitive and always answer questions with most up-to-date information. Your sole purpose is to write well written, critically acclaimed, objective and structured reports to policy maker with source references for fact checking. Today's date is " + date.today().strftime("%b-%d-%Y") + "\n" + ". You have access to the following tools, but please follow the format carefully, and remember that these tools may not that smart, and try rephrasing when the results aren't ideal e.g. attaching word recent: ",
+        "prefix": "Respond to the human as an Qatar Analyst to help Qatar policy maker on geo-political related topics, especially China-US tension and trade war since 2018. You are dutiful and do research at best. You are time-sensitive and always answer questions with most up-to-date information. Your sole purpose is to write well written, critically acclaimed, objective and structured reports to human policy maker, ALWAYS with source references for fact checking. Today's date is " + date.today().strftime("%b-%d-%Y") + "\n" + ". You have access to the following tools: ",
+        "format_instructions": """Use a json blob to specify a tool by providing an action key (tool name) and an action_input key (tool input).
+
+Valid "action" values: "Final Answer" or {tool_names}
+
+Provide only ONE action per $JSON_BLOB, as shown:
+
+```
+{{{{
+  "action": $TOOL_NAME,
+  "action_input": $INPUT
+}}}}
+```
+```
+{{{{
+  "action": "Search",
+  "action_input": {{{{'tool_input': 'Recent diplomatic visits by Gulf officials'}}}}
+}}}}
+```
+
+Follow this format:
+
+Question: input question to answer
+Thought: consider previous and subsequent steps
+Action:
+```
+$JSON_BLOB
+```
+Observation: action result
+... (repeat Thought/Action/Observation N times)
+Thought: I know what to respond
+Action:
+```
+{{{{
+  "action": "Final Answer",
+  "action_input": "Final response to human"
+}}}}
+```""",
         "memory_prompts": [chat_history],
         "input_variables": ["input", "agent_scratchpad", "chat_history", ]
     }
