@@ -22,8 +22,8 @@ st.markdown("<h2 style='text-align: center; color: white;'><img style=\"margin-r
 from langchain.tools import BaseTool
 
 QUESTIONS = [
-    "Products manufactured in UAE and KSA exported to USA and Europe linked to similar products manufactured in China",
-    "Movement of officials from the region around the world",
+    "List the products manufactured in UAE and KSA exported to USA and Europe linked to similar products manufactured in China",
+    "List the movement of officials from the MEMA region around the world",
     "Will there be another blockade on Qatar? How soon?"
 ]
 
