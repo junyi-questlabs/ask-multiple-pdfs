@@ -261,6 +261,11 @@ chat_history = MessagesPlaceholder(variable_name="chat_history")
 memory = ConversationBufferMemory(
     memory_key="chat_history", k=6, chat_memory=msgs, return_messages=True)
 
+from knowledge import prepare_pdfs
+
+vs = prepare_pdfs()
+knowledge_retriever = vs.as_retriever(search_kwargs={"k": 10})
+
 # initialize the agent
 agent = initialize_agent(
     [Tool(
@@ -268,7 +273,12 @@ agent = initialize_agent(
         func=search.run,
         description="useful for when you need to answer questions about current events with source references for fact checking, try rephrasing tool_input when the result isn't ideal e.g. attaching word recent",
     ),
-    KSAExportUSData(), UAEExportUSData(), ChinaManufactureData()],
+    KSAExportUSData(), UAEExportUSData(), ChinaManufactureData(),
+    Tool(
+        name="Annual Report",
+        func=knowledge_retriever.invoke,
+        description="useful for when you need to answer questions about Annual Reports of Motherson with source references for fact checking, try rephrasing tool_input when the result isn't ideal",
+    )],
     llm,
     agent=AgentType.STRUCTURED_CHAT_ZERO_SHOT_REACT_DESCRIPTION,
     verbose=True,
