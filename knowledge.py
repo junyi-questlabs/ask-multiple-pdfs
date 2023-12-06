@@ -63,7 +63,7 @@ def get_vectorstore(pgbar, text_chunks):
                        text=f"Processing page {idx + 1} of {len(text_chunks)}")
         # Check if embeddings file exists for the page
         vectorstore = FAISS.from_texts(texts=page["chunks"],
-                                embedding=embeddings, 
+                                embedding=cached_embedder, 
                                 metadatas=[page["meta"] for _ in page["chunks"]])
 
         vectorstores.merge_from(vectorstore)
