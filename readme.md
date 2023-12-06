@@ -7,3 +7,9 @@
 ## Run
 
 `OPENAI_API_KEY=<YOUR KEY> streamlit run app.py`
+
+
+## Branches:
+Qatar: Qatar MOD LLM, no RAG feature, stable ver.
+main: RAG + Agent + Tool for Qatar
+Motherson: RAG + Agent
