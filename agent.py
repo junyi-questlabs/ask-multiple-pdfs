@@ -22,9 +22,9 @@ st.markdown("<h2 style='text-align: center; color: white;'><img style=\"margin-r
 from langchain.tools import BaseTool
 
 QUESTIONS = [
-    "List the products manufactured in UAE and KSA exported to USA and Europe linked to similar products manufactured in China",
-    "List the movement of officials from the MEMA region around the world",
-    "Will there be another blockade on Qatar? How soon?"
+    "What's the registered office and corporate address of Motherson? Who is the main contact for Motherson?",
+    "What are the key product and services that Motherson offers?",
+    "What's Motherson's latest future and long-term vision for growth? What's their most recent actions?"
 ]
 
 # Sorry for the selectors but Streamlit sucks
@@ -271,20 +271,20 @@ agent = initialize_agent(
     [Tool(
         name="Search",
         func=search.run,
-        description="useful for when you need to answer questions about current events with source references for fact checking, try rephrasing tool_input when the result isn't ideal e.g. attaching word recent",
+        description="only use this tool when you need to answer questions about current events but unable to find the fact in the Annual Report tool. Always try Annual Report tool first, with source references for fact checking, try rephrasing tool_input when the result isn't ideal e.g. attaching word recent",
     ),
     # KSAExportUSData(), UAEExportUSData(), ChinaManufactureData(),
     Tool(
-        name="Annual Report",
+        name="SMAIL Annual Report",
         func=knowledge_retriever.invoke,
-        description="useful for when you need to answer questions about Annual Reports of Motherson with source references for fact checking, try rephrasing tool_input when the result isn't ideal",
+        description="useful for when you need to answer questions about Annual Reports of Motherson with source references for fact checking, or when you need any information about Motherson, or SAMIL-Annual-Report-2021-22.pdf. Try rephrasing tool_input when the result isn't ideal",
     )],
     llm,
     agent=AgentType.STRUCTURED_CHAT_ZERO_SHOT_REACT_DESCRIPTION,
     verbose=True,
     memory=memory,
     agent_kwargs={
-        "prefix": "Respond to the human as an Qatar Analyst to help human policy maker on geo-political related topics, especially China-US tension and trade war since 2018. You are dutiful and do research at best. You are time-sensitive and always answer questions with most up-to-date information. Your sole purpose is to write well written, critically acclaimed, objective and structured reports to human policy maker, ALWAYS with source references for fact checking. Today's date is " + date.today().strftime("%b-%d-%Y") + "\n" + ". You have access to the following tools: ",
+        "prefix": "Respond to the human as an Indian Analyst to help human policy maker on business topics. You are dutiful and do research at best. You are time-sensitive and always answer questions with most up-to-date information. Your sole purpose is to write well written, critically acclaimed, objective and structured reports to human policy maker, ALWAYS with source references for fact checking. Today's date is " + date.today().strftime("%b-%d-%Y") + "\n" + ". You have access to the following tools: ",
         "format_instructions": """Use a json blob to specify a tool by providing an action key (tool name) and an action_input key (tool input).
 
 Valid "action" values: "Final Answer" or {tool_names}
