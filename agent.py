@@ -6,7 +6,7 @@ from langchain.memory import ConversationBufferMemory
 from langchain.prompts import MessagesPlaceholder
 from langchain.memory.chat_message_histories import StreamlitChatMessageHistory
 from langchain.schema.messages import SystemMessage
-from langchain.tools import DuckDuckGoSearchResults
+from langchain.utilities import SerpAPIWrapper
 
 from dotenv import load_dotenv
 import streamlit as st
@@ -239,7 +239,7 @@ Bird skin, feathers, artificial flowers, human hair 	$5.52B
 
 # set up the agent
 llm = ChatOpenAI(model_name="gpt-4-1106-preview", temperature=0, streaming=True)
-search = DuckDuckGoSearchResults()
+search = SerpAPIWrapper()
 msgs = StreamlitChatMessageHistory()
 chat_history = MessagesPlaceholder(variable_name="chat_history")
 memory = ConversationBufferMemory(
