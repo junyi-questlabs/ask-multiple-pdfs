@@ -6,11 +6,11 @@ from langchain.memory import ConversationBufferMemory
 from langchain.prompts import MessagesPlaceholder
 from langchain.memory.chat_message_histories import StreamlitChatMessageHistory
 from langchain.schema.messages import SystemMessage
-from langchain.utilities import SerpAPIWrapper
+from langchain.utilities import GoogleSearchAPIWrapper
 
 from dotenv import load_dotenv
 import streamlit as st
-import time
+import json
 
 from datetime import date
 
@@ -236,10 +236,26 @@ Bird skin, feathers, artificial flowers, human hair 	$5.52B
     
     def _arun(self):
         return self._ret
+    
+
+RESPONSE_KEYS = ["title", "link", "snippet"]
+class GoogleSearchWithRefWrapper(GoogleSearchAPIWrapper):
+    def run(self, query: str) -> str:
+        """Run query through GoogleSearch and parse result."""
+        snippets = []
+        results = self._google_search_results(query, num=self.k)
+        if len(results) == 0:
+            return "No good Google Search Result was found"
+        for result in results:
+            if "snippet" in result:
+                snippets.append(json.dumps({k: result[k] for k in RESPONSE_KEYS}, indent=4))
+
+        return "\n\n".join(snippets)
+
 
 # set up the agent
 llm = ChatOpenAI(model_name="gpt-4-1106-preview", temperature=0, streaming=True)
-search = SerpAPIWrapper()
+search = GoogleSearchWithRefWrapper()
 msgs = StreamlitChatMessageHistory()
 chat_history = MessagesPlaceholder(variable_name="chat_history")
 memory = ConversationBufferMemory(
