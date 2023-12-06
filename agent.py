@@ -273,7 +273,7 @@ agent = initialize_agent(
         func=search.run,
         description="useful for when you need to answer questions about current events with source references for fact checking, try rephrasing tool_input when the result isn't ideal e.g. attaching word recent",
     ),
-    KSAExportUSData(), UAEExportUSData(), ChinaManufactureData(),
+    # KSAExportUSData(), UAEExportUSData(), ChinaManufactureData(),
     Tool(
         name="Annual Report",
         func=knowledge_retriever.invoke,
