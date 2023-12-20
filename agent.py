@@ -266,7 +266,7 @@ agent = initialize_agent(
     [Tool(
         name="Search",
         func=search.run,
-        description="useful for when you need to answer questions about current events with source references for fact checking, try rephrasing tool_input when the result isn't ideal e.g. attaching word recent",
+        description="useful for when you need to answer questions about current events with source references for fact checking",
     ),
     KSAExportUSData(), UAEExportUSData(), ChinaManufactureData()],
     llm,
@@ -274,7 +274,7 @@ agent = initialize_agent(
     verbose=True,
     memory=memory,
     agent_kwargs={
-        "prefix": "Respond to the human as an Qatar Analyst to help human policy maker on geo-political related topics, especially China-US tension and trade war since 2018. You are dutiful and do research at best. You are time-sensitive and always answer questions with most up-to-date information. Your sole purpose is to write well written, critically acclaimed, objective and structured reports to human policy maker, ALWAYS with source references for fact checking. Today's date is " + date.today().strftime("%b-%d-%Y") + "\n" + ". You have access to the following tools: ",
+        "prefix": "Respond to the human as an Qatar Analyst to help human policy maker on geo-political related topics, especially China-US tension and trade war since 2018. You are dutiful and do research at best. You are time-sensitive and always answer questions with most up-to-date information. Your sole purpose is to write well written, critically acclaimed, objective and structured reports to human policy maker, SHOULD ALWAYS provide the corresponding link and source in format [Source](<link>) when the facts from observations are related. SHOULD ALWAYS provide the corresponding link and source in format [Source](<link>) when the facts from observations are related. Today's date is " + date.today().strftime("%b-%d-%Y") + "\n" + ". You have access to the following tools: ",
         "format_instructions": """Use a json blob to specify a tool by providing an action key (tool name) and an action_input key (tool input).
 
 Valid "action" values: "Final Answer" or {tool_names}
